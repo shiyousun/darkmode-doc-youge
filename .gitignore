@@ -1,0 +1,20 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.DS_Store
+*.egg-info/
+.venv/
+venv/
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# 测试输出
+dark/
+test_output/
+*_dark.pdf
+*_dark.docx
+*_dark.xlsx

@@ -2,6 +2,15 @@
 """
 darkmode_pdf.py — 把 PDF 转成护眼模式（温柔反色，兼容扫描件/复杂排版）
 
+PDF 处理说明（v2.0）：
+- PDF 的护眼采用「整页栅格化反色」方案（每页渲染为图再反色）
+- 这种方案适用于扫描件、复杂排版、含公式的 PDF
+- **但无法在保留图片原色的同时只反色文字**（图文一体栅格化）
+- 因此 `--invert-images` 参数对 PDF 无实际差异（始终整页反色）
+- 如果用户必须保留 PDF 内图片原色，请：
+  1. 用阅读器自带的暗色模式（Adobe Reader / Apple Books）
+  2. 或先把 PDF 转 DOCX，再用 `darkmode_docx.py` 不带 `--invert-images` 处理
+
 用法：
     python3 darkmode_pdf.py input.pdf [output.pdf] [--dpi 200] [--theme warm]
 
@@ -32,7 +41,15 @@ def convert_pdf_to_darkmode(
     output_path: Path,
     dpi: int = 200,
     theme_name: str = DEFAULT_THEME,
+    invert_images: bool = True,
 ) -> dict:
+    """
+    PDF 整页栅格化反色。
+
+    参数：
+        invert_images: 仅作命令行接口一致性，PDF 始终整页反色（图文一体）。
+                       未来若实现「保留原图」方案再启用此参数。
+    """
     theme = get_theme(theme_name)
     src = fitz.open(str(input_path))
     dst = fitz.open()
@@ -75,7 +92,19 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="PDF 护眼模式转换器")
     parser.add_argument("input", help="输入 PDF 路径")
     parser.add_argument("output", nargs="?", help="输出 PDF 路径（默认 xxx_dark.pdf）")
-    parser.add_argument("--dpi", type=int, default=200, help="渲染分辨率（默认 200）")
+    parser.add_argument(
+        "--dpi", type=int, default=200, help="渲染分辨率（默认 200）"
+    )
+    parser.add_argument(
+        "--invert-images",
+        action="store_true",
+        help="（PDF 始终整页反色，此参数无差异，仅为命令行接口一致性）",
+    )
+    parser.add_argument(
+        "--no-images",
+        action="store_true",
+        help="（PDF 始终整页反色，此参数无差异，仅为命令行接口一致性）",
+    )
     parser.add_argument(
         "--theme",
         default=DEFAULT_THEME,
@@ -102,9 +131,12 @@ def main(argv: list[str] | None = None) -> int:
     print(f"  输入: {input_path}")
     print(f"  输出: {output_path}")
     print(f"  DPI : {args.dpi}")
+    print(f"  注意: PDF 整页栅格化反色，无法区分图片与文字（--invert-images 选项对 PDF 无效）")
     print(f"  主题: {args.theme} ({theme['name']}) bg=#{theme['bg']} fg=#{theme['fg']}")
 
-    info = convert_pdf_to_darkmode(input_path, output_path, dpi=args.dpi, theme_name=args.theme)
+    info = convert_pdf_to_darkmode(
+        input_path, output_path, dpi=args.dpi, theme_name=args.theme
+    )
     print(
         f"✅ 完成 · {info['pages']} 页 · "
         f"{info['size_in'] / 1024 / 1024:.2f} MB → {info['size_out'] / 1024 / 1024:.2f} MB"

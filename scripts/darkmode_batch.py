@@ -1,11 +1,20 @@
 #!/usr/bin/env python3
 """
-darkmode_batch.py — 批量把目录下所有 Word/PDF/Excel 文件转成护眼模式
+darkmode_batch.py — 批量把目录下所有 Word/PDF/Excel/图片 转成护眼模式
+
+两档模式（v2.0 新增）：
+- 默认（不加任何参数）：DOCX/DOC 只改背景+文字+表格+边框，不动插图
+- 加 `--invert-images`：DOCX/DOC 同时温柔反色所有内嵌图片（含 WMF 公式）
+
+性能优化（v2.0）：
+- .doc → .docx 改为按子目录分组批量调用 soffice（复用启动开销），处理大量 .doc 提速 10-20 倍
+- WMF 矢量公式图（Word 老格式常见）自动用 libwmf 的 wmf2gd 工具反色（需 brew install libwmf）
 
 用法：
     python3 darkmode_batch.py /path/to/dir
     python3 darkmode_batch.py /path/to/dir --theme paper
-    python3 darkmode_batch.py /path/to/dir --no-recursive --no-images --dpi 300
+    python3 darkmode_batch.py /path/to/dir --invert-images --theme warm
+    python3 darkmode_batch.py /path/to/dir --no-recursive --dpi 300
     python3 darkmode_batch.py /path/to/dir --out /custom/output
 
 主题（--theme）：
@@ -22,13 +31,14 @@ import subprocess
 import sys
 import tempfile
 import time
+from collections import defaultdict
 from pathlib import Path
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 sys.path.insert(0, str(SCRIPT_DIR))
 
 from darkmode_pdf import convert_pdf_to_darkmode
-from darkmode_docx import convert_docx_to_darkmode
+from darkmode_docx import convert_docx_to_darkmode, find_wmf2gd
 from darkmode_xlsx import convert_xlsx_to_darkmode
 from darkmode_image import convert_image_to_darkmode
 from themes import DEFAULT_THEME, THEMES, get_theme
@@ -84,7 +94,59 @@ def find_soffice() -> str | None:
     return None
 
 
+def batch_pre_convert_docs(
+    doc_files: list[Path], soffice: str
+) -> dict[Path, Path]:
+    """
+    按 parent 目录分组批量调用 soffice 把 .doc 转成 .docx，输出到临时目录。
+    复用 soffice 启动开销，处理大量 .doc 提速 10-20 倍。
+
+    返回 {原 doc 路径: 转换后 docx 临时路径}
+    """
+    if not doc_files:
+        return {}
+
+    groups: dict[Path, list[Path]] = defaultdict(list)
+    for d in doc_files:
+        groups[d.parent].append(d)
+
+    result: dict[Path, Path] = {}
+    tmproot = Path(tempfile.mkdtemp(prefix="darkmode_doc_batch_"))
+
+    print(
+        f"\n🚀 .doc 批量预转换：{len(doc_files)} 个文件分布在 {len(groups)} 个目录"
+    )
+
+    for i, (parent, docs) in enumerate(groups.items(), 1):
+        out_subdir = tmproot / f"g{i:03d}"
+        out_subdir.mkdir(parents=True, exist_ok=True)
+        cmd = [
+            soffice,
+            "--headless",
+            "--convert-to",
+            "docx",
+            "--outdir",
+            str(out_subdir),
+        ] + [str(d) for d in docs]
+        try:
+            subprocess.run(cmd, capture_output=True, timeout=900)
+        except subprocess.TimeoutExpired:
+            print(f"   ⚠️  [{i}/{len(groups)}] {parent} soffice 超时，跳过")
+            continue
+
+        success = 0
+        for d in docs:
+            out_docx = out_subdir / (d.stem + ".docx")
+            if out_docx.exists():
+                result[d] = out_docx
+                success += 1
+        print(f"   [{i}/{len(groups)}] {parent.name}/ : {success}/{len(docs)}")
+
+    return result
+
+
 def doc_to_docx(input_path: Path) -> Path | None:
+    """单文件转换（兜底，正常批处理会用 batch_pre_convert_docs 提前转好）"""
     soffice = find_soffice()
     if not soffice:
         return None
@@ -119,6 +181,7 @@ def process_one(
     invert_images: bool,
     pdf_dpi: int,
     theme_name: str,
+    doc_pre_converted: dict[Path, Path] | None = None,
 ) -> tuple[bool, str, dict | None]:
     out_dir.mkdir(parents=True, exist_ok=True)
     suffix = src.suffix.lower()
@@ -127,12 +190,17 @@ def process_one(
     try:
         if suffix == ".pdf":
             output = out_dir / f"{src.stem}_dark.pdf"
-            info = convert_pdf_to_darkmode(src, output, dpi=pdf_dpi, theme_name=theme_name)
+            info = convert_pdf_to_darkmode(
+                src, output, dpi=pdf_dpi, theme_name=theme_name
+            )
             return True, str(output), info
         if suffix == ".docx":
             output = out_dir / f"{src.stem}_dark.docx"
             info = convert_docx_to_darkmode(
-                src, output, invert_images=invert_images, theme_name=theme_name
+                src,
+                output,
+                invert_images=invert_images,
+                theme_name=theme_name,
             )
             return True, str(output), info
         if suffix == ".xlsx":
@@ -144,17 +212,20 @@ def process_one(
             info = convert_image_to_darkmode(src, output, theme_name=theme_name)
             return True, str(output), info
         if suffix == ".doc":
-            converted = doc_to_docx(src)
+            converted = (
+                doc_pre_converted.get(src) if doc_pre_converted else None
+            )
+            if converted is None or not converted.exists():
+                converted = doc_to_docx(src)
             if not converted:
                 return False, "缺少 LibreOffice (soffice)，无法处理 .doc", None
             output = out_dir / f"{src.stem}_dark.docx"
             info = convert_docx_to_darkmode(
-                converted, output, invert_images=invert_images, theme_name=theme_name
+                converted,
+                output,
+                invert_images=invert_images,
+                theme_name=theme_name,
             )
-            try:
-                shutil.rmtree(converted.parent, ignore_errors=True)
-            except Exception:
-                pass
             return True, str(output), info
         return False, f"不支持的格式: {suffix}", None
     except Exception as e:
@@ -171,7 +242,7 @@ def fmt_size(n: int) -> str:
 
 def parse_args(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="批量把 Word/PDF/Excel 文档转成护眼模式"
+        description="批量把 Word/PDF/Excel/图片 转成护眼模式"
     )
     parser.add_argument("root", help="要处理的根目录")
     parser.add_argument(
@@ -180,9 +251,14 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         help="只处理当前目录，不递归子目录",
     )
     parser.add_argument(
+        "--invert-images",
+        action="store_true",
+        help="DOCX/DOC 同时温柔反色内嵌图片（含 WMF 公式）。默认不反色插图。",
+    )
+    parser.add_argument(
         "--no-images",
         action="store_true",
-        help="DOCX 不反色内嵌图片",
+        help="（兼容旧版，与默认行为一致：不反色插图）",
     )
     parser.add_argument(
         "--dpi",
@@ -219,19 +295,44 @@ def main(argv: list[str] | None = None) -> int:
     files = find_files(root, recursive=not args.no_recursive)
     theme = get_theme(args.theme)
 
+    invert_images = bool(args.invert_images) and not bool(args.no_images)
+
     print("=" * 70)
     print(f"📂 源目录: {root}")
     print(f"📂 输出目录: {out_root}")
-    print(f"🎨 护眼主题: {args.theme} ({theme['name']}) bg=#{theme['bg']} fg=#{theme['fg']}")
+    print(
+        f"🎨 护眼主题: {args.theme} ({theme['name']}) bg=#{theme['bg']} fg=#{theme['fg']}"
+    )
     print(f"🔍 递归: {'否' if args.no_recursive else '是'}")
-    print(f"🖼  反色 DOCX 图片: {'否' if args.no_images else '是'}")
+    print(f"🖼  反色 DOCX 插图: {'是' if invert_images else '否（仅改背景+文字）'}")
+    if invert_images:
+        wmf2gd = find_wmf2gd()
+        print(
+            f"   WMF 公式反色: "
+            + ("是 (" + wmf2gd + ")" if wmf2gd else "否（未找到 wmf2gd，brew install libwmf 启用）")
+        )
     print(f"📐 PDF 渲染 DPI: {args.dpi}")
     print(f"📄 待处理文件: {len(files)}")
     print("=" * 70)
 
     if not files:
-        print("⚠️  没有找到可处理的文件 (.pdf / .docx / .doc / .xlsx / .jpg / .png 等)")
+        print(
+            "⚠️  没有找到可处理的文件 (.pdf / .docx / .doc / .xlsx / .jpg / .png 等)"
+        )
         return 0
+
+    # 性能优化：先批量预转换所有 .doc → .docx
+    doc_pre: dict[Path, Path] = {}
+    doc_files = [f for f in files if f.suffix.lower() == ".doc"]
+    if doc_files:
+        soffice = find_soffice()
+        if soffice:
+            t_pre = time.time()
+            doc_pre = batch_pre_convert_docs(doc_files, soffice)
+            print(
+                f"✅ .doc 批量预转换完成 · {len(doc_pre)}/{len(doc_files)} 成功 · "
+                f"耗时 {time.time() - t_pre:.1f}s"
+            )
 
     succeeded: list[tuple[Path, str, dict]] = []
     failed: list[tuple[Path, str]] = []
@@ -243,30 +344,45 @@ def main(argv: list[str] | None = None) -> int:
 
         sub_dir = out_root / rel.parent
         ok, msg, info = process_one(
-            src, sub_dir, not args.no_images, args.dpi, args.theme
+            src,
+            sub_dir,
+            invert_images,
+            args.dpi,
+            args.theme,
+            doc_pre_converted=doc_pre,
         )
         if ok:
             succeeded.append((src, msg, info or {}))
-            extra = ""
+            extras = []
             if info:
                 if "pages" in info:
-                    extra = f" · {info['pages']} 页"
-                elif "images_inverted" in info:
-                    extra = f" · 反色图片 {info['images_inverted']} 张"
+                    extras.append(f"{info['pages']} 页")
+                elif src.suffix.lower() in (".docx", ".doc"):
+                    if info.get("images_inverted"):
+                        extras.append(f"反色插图 {info['images_inverted']} 张")
+                    if info.get("wmf_inverted"):
+                        extras.append(f"反色 WMF {info['wmf_inverted']} 张")
                 elif "sheets" in info:
-                    extra = f" · {info['sheets']} 工作表"
+                    extras.append(f"{info['sheets']} 工作表")
                 elif src.suffix.lower() in IMAGE_EXTS:
-                    extra = " · 单图护眼"
+                    extras.append("单图护眼")
                 size_in = info.get("size_in", 0)
                 size_out = info.get("size_out", 0)
                 if size_in and size_out:
-                    extra += f" · {fmt_size(size_in)} → {fmt_size(size_out)}"
-            print(f"   ✅ {Path(msg).name}{extra}")
+                    extras.append(f"{fmt_size(size_in)} → {fmt_size(size_out)}")
+            extra_str = (" · " + " · ".join(extras)) if extras else ""
+            print(f"   ✅ {Path(msg).name}{extra_str}")
         else:
             failed.append((src, msg))
             print(f"   ❌ {msg}")
 
     elapsed = time.time() - t0
+
+    # 清理预转换的临时 .docx
+    if doc_pre:
+        tmp_root_candidates = {p.parent.parent for p in doc_pre.values()}
+        for tr in tmp_root_candidates:
+            shutil.rmtree(tr, ignore_errors=True)
 
     print("\n" + "=" * 70)
     print(f"📊 汇总 (耗时 {elapsed:.1f}s)")

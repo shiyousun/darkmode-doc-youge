@@ -6,6 +6,9 @@
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
+> 📖 **[点这里看完整使用说明](使用说明.md)** ——  8 个真实场景示例 · 10 个 FAQ · 故障排除 · 决策表  
+> 也可下载 [使用说明.html](使用说明.html) 离线查看（用 skill 自己的 warm 暖杏色主题渲染，自食其味）
+
 ---
 
 ## 🆕 v2.0 重大升级（2026-05）

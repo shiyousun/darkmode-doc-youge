@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>darkmode-doc-youge 使用说明</title>
+<style>
+* { box-sizing: border-box; }
+html { font-size: 16px; }
+body {
+    background: #1F1F1F;
+    color: #D4C9A8;
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.75;
+    margin: 0;
+    padding: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+.container {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 48px 32px 80px;
+}
+.brand {
+    text-align: center;
+    padding: 32px 0 16px;
+    border-bottom: 1px solid #5A5142;
+    margin-bottom: 32px;
+}
+.brand .moon { font-size: 56px; line-height: 1; }
+.brand .name {
+    font-size: 28px;
+    font-weight: 600;
+    margin-top: 12px;
+    letter-spacing: 0.5px;
+}
+.brand .tag {
+    color: #A89B7A;
+    font-size: 14px;
+    margin-top: 8px;
+}
+h1, h2, h3, h4 {
+    color: #E8DCB8;
+    font-weight: 600;
+    line-height: 1.4;
+    margin: 1.8em 0 0.6em;
+}
+h1 { font-size: 26px; border-bottom: 1px solid #5A5142; padding-bottom: 12px; }
+h2 { font-size: 22px; border-bottom: 1px solid #3A332A; padding-bottom: 8px; }
+h3 { font-size: 18px; color: #D4C9A8; }
+h4 { font-size: 16px; color: #C5BA9C; }
+p { margin: 0.9em 0; }
+a {
+    color: #F0C674;
+    text-decoration: none;
+    border-bottom: 1px dashed #8C7E5E;
+    transition: all 0.2s;
+}
+a:hover { color: #FFE5A0; border-bottom-color: #F0C674; }
+strong { color: #E8DCB8; font-weight: 600; }
+em { color: #B8AB87; }
+hr { border: none; border-top: 1px solid #3A332A; margin: 32px 0; }
+blockquote {
+    background: #1A1A1A;
+    border-left: 4px solid #8C7E5E;
+    padding: 16px 20px;
+    margin: 20px 0;
+    color: #C5BA9C;
+    border-radius: 0 6px 6px 0;
+}
+blockquote p { margin: 0.4em 0; }
+ul, ol { padding-left: 24px; margin: 0.6em 0 1em; }
+li { margin: 0.4em 0; }
+code {
+    background: #2A2620;
+    color: #F0C674;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SF Mono", Monaco, Menlo, "Consolas", monospace;
+    font-size: 0.92em;
+}
+pre {
+    background: #15140F;
+    border: 1px solid #3A332A;
+    border-radius: 8px;
+    padding: 16px 20px;
+    overflow-x: auto;
+    margin: 16px 0;
+    line-height: 1.55;
+}
+pre code {
+    background: transparent;
+    color: #D4C9A8;
+    padding: 0;
+    font-size: 0.92em;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 18px 0;
+    background: #1A1A1A;
+    border-radius: 6px;
+    overflow: hidden;
+}
+table th {
+    background: #2A2620;
+    color: #E8DCB8;
+    font-weight: 600;
+    text-align: left;
+    padding: 12px 16px;
+    border-bottom: 1px solid #3A332A;
+}
+table td {
+    padding: 10px 16px;
+    border-bottom: 1px solid #2A2620;
+    vertical-align: top;
+}
+table tr:last-child td { border-bottom: none; }
+table tr:hover { background: #221F1A; }
+table code { background: #15140F; font-size: 0.88em; }
+
+/* 警告/提示框 */
+.callout {
+    background: #2A2620;
+    border-left: 4px solid #F0C674;
+    padding: 14px 18px;
+    border-radius: 0 6px 6px 0;
+    margin: 18px 0;
+}
+
+footer {
+    text-align: center;
+    color: #8C7E5E;
+    font-size: 13px;
+    margin-top: 64px;
+    padding: 32px 0 0;
+    border-top: 1px solid #3A332A;
+}
+footer a { color: #A89B7A; border-bottom: none; }
+footer a:hover { color: #F0C674; }
+
+/* 响应式 */
+@media (max-width: 640px) {
+    .container { padding: 24px 16px 48px; }
+    h1 { font-size: 22px; }
+    h2 { font-size: 19px; }
+    h3 { font-size: 17px; }
+    pre { font-size: 0.86em; }
+    table { font-size: 14px; }
+    table th, table td { padding: 8px 10px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="brand">
+    <div class="moon">🌙</div>
+    <div class="name">darkmode-doc-youge</div>
+    <div class="tag">把 Word / PDF / Excel / 图片 一键转成「真护眼」文档</div>
+  </div>
+  <h1 id="darkmode-doc-youge">📖 darkmode-doc-youge 使用说明</h1>
+<blockquote>
+<p>把 Word / PDF / Excel / 图片一键换成「真护眼」黑底文档。<br />
+<strong>比纯黑底白字更柔和</strong>，眼睛长时间看资料不再累。</p>
+</blockquote>
+<p>适合：</p>
+<ul>
+<li>🧑‍🎓 给孩子做电子试卷复习、晚上看作业的家长</li>
+<li>📚 长时间阅读 PDF 资料、电子书的上班族</li>
+<li>👨‍💻 写代码累了想看暖色调文档的程序员</li>
+<li>📷 经常拍纸质资料、网页截图的学习党</li>
+</ul>
+<hr />
+<h2 id="5">⚡ 5 分钟上手</h2>
+<h3 id="1-2-5">1. 装依赖（首次必装，2-5 分钟）</h3>
+<p><strong>macOS</strong>：</p>
+<pre><code class="language-bash"># Python 库
+pip3 install --user --break-system-packages PyMuPDF python-docx Pillow openpyxl
+
+# 系统工具（处理 .doc 老格式 + WMF 数学公式必装）
+brew install libreoffice libwmf
+</code></pre>
+<p><strong>Ubuntu / Debian</strong>：</p>
+<pre><code class="language-bash">pip3 install PyMuPDF python-docx Pillow openpyxl
+sudo apt install libreoffice libwmf-bin
+</code></pre>
+<p><strong>Windows</strong>：建议在 WSL2 里跑（命令同 Ubuntu）。原生 Windows 也可以，但 LibreOffice 路径需要手动配置。</p>
+<h3 id="2-skill">2. 把 skill 放到本地</h3>
+<pre><code class="language-bash"># 方式一：从 GitHub 克隆
+cd ~
+git clone https://github.com/shiyousun/darkmode-doc-youge.git
+cd darkmode-doc-youge
+
+# 方式二：直接下载 zip 解压到任意目录
+</code></pre>
+<h3 id="3">3. 跑第一个例子（用你自己的资料）</h3>
+<pre><code class="language-bash"># 替换成你的目录路径
+python3 scripts/darkmode_batch.py &quot;/路径/你的资料夹&quot;
+</code></pre>
+<p><strong>完事</strong>——结果在你的资料夹下生成的 <code>dark/</code> 子目录里，原文件零修改，可以放心试。</p>
+<hr />
+<h2 id="_1">🎯 两档模式怎么选？</h2>
+<p>v2.0 最重要的能力是<strong>两档模式</strong>，本质区别在「插图要不要也反色」：</p>
+<table>
+<thead>
+<tr>
+<th>模式</th>
+<th>命令</th>
+<th>适合</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>默认</strong>（不反色插图）</td>
+<td><code>python3 scripts/darkmode_batch.py "/路径"</code></td>
+<td>文档里有<strong>彩色照片</strong>、<strong>地图</strong>、<strong>产品截图</strong>、<strong>实验图</strong>——保留原色更好看</td>
+</tr>
+<tr>
+<td><strong><code>--invert-images</code></strong>（反色插图）</td>
+<td><code>python3 scripts/darkmode_batch.py "/路径" --invert-images</code></td>
+<td>文档里以<strong>黑白线条</strong>为主——比如数学公式、几何图、电路图、流程图——反色才统一好看</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_2">真实决策表</h3>
+<table>
+<thead>
+<tr>
+<th>文档类型</th>
+<th>推荐模式</th>
+<th>原因</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>初中化学/物理 课本</td>
+<td>默认</td>
+<td>实验照片是彩色的，反色后会发绿/发紫，难看</td>
+</tr>
+<tr>
+<td>初中地理/历史 教材</td>
+<td>默认</td>
+<td>地图、文物照片必须保持原色才能看</td>
+</tr>
+<tr>
+<td>商业 PPT、产品介绍</td>
+<td>默认</td>
+<td>品牌图标、产品截图反色就废了</td>
+</tr>
+<tr>
+<td>食谱、旅游攻略</td>
+<td>默认</td>
+<td>食物照片必须原色</td>
+</tr>
+<tr>
+<td>数学试卷、几何题集</td>
+<td><code>--invert-images</code></td>
+<td>公式、几何图都是黑白线条，反色后跟暗色背景融为一体</td>
+</tr>
+<tr>
+<td>物理试卷、电路图</td>
+<td><code>--invert-images</code></td>
+<td>电路图都是黑白，反色后变成暖米杏色，视觉统一</td>
+</tr>
+<tr>
+<td>法律/医学教材（黑白示意图）</td>
+<td><code>--invert-images</code></td>
+<td>示意图反色后更护眼</td>
+</tr>
+<tr>
+<td>学术论文（黑白图表）</td>
+<td><code>--invert-images</code></td>
+<td>同上</td>
+</tr>
+</tbody>
+</table>
+<p><strong>不确定？</strong> 先用<strong>默认模式</strong>——保留插图原色总是安全的，大不了发现公式还是白底再加 <code>--invert-images</code> 重跑一次。</p>
+<hr />
+<h2 id="_3">📋 命令速查</h2>
+<h3 id="_4">批处理整个目录（最常用 ⭐）</h3>
+<pre><code class="language-bash"># 默认：仅改背景+文字，不动插图
+python3 scripts/darkmode_batch.py &quot;/路径&quot;
+
+# 反色全部：含数学公式、几何图、所有插图
+python3 scripts/darkmode_batch.py &quot;/路径&quot; --invert-images
+
+# 换主题
+python3 scripts/darkmode_batch.py &quot;/路径&quot; --theme paper      # 仿羊皮纸 sepia
+python3 scripts/darkmode_batch.py &quot;/路径&quot; --theme gray       # 暖灰，不那么黄
+python3 scripts/darkmode_batch.py &quot;/路径&quot; --theme pure       # 旧版纯黑白（最刺眼，仅兼容用）
+
+# 只处理当前目录不递归
+python3 scripts/darkmode_batch.py &quot;/路径&quot; --no-recursive
+
+# PDF 调高清晰度（默认 200dpi，调 300 更清晰但更慢更大）
+python3 scripts/darkmode_batch.py &quot;/路径&quot; --dpi 300
+
+# 自定义输出位置（默认在源目录下建 dark/）
+python3 scripts/darkmode_batch.py &quot;/路径&quot; --out &quot;/自定义输出位置&quot;
+</code></pre>
+<h3 id="_5">单文件转换</h3>
+<pre><code class="language-bash"># PDF（PDF 始终整页栅格化反色，无图文区分能力）
+python3 scripts/darkmode_pdf.py 输入.pdf [输出.pdf] [--dpi 200] [--theme warm]
+
+# Word（默认保留插图原色）
+python3 scripts/darkmode_docx.py 输入.docx [输出.docx] [--theme warm]
+
+# Word（反色含 WMF 公式）
+python3 scripts/darkmode_docx.py 输入.docx [输出.docx] --invert-images [--theme warm]
+
+# Excel
+python3 scripts/darkmode_xlsx.py 输入.xlsx [输出.xlsx] [--theme warm]
+
+# 单图（jpg/png/jpeg/bmp/gif/tiff/webp，自动 EXIF 旋转校正）
+python3 scripts/darkmode_image.py 输入.jpg [输出.jpg] [--theme warm]
+</code></pre>
+<hr />
+<h2 id="8">🌟 8 个真实场景</h2>
+<h3 id="1">场景 1：晚上给孩子复习中考真题（数学/物理试卷）</h3>
+<pre><code class="language-bash">python3 scripts/darkmode_batch.py &quot;~/Documents/孩子/中考真题&quot; --invert-images
+</code></pre>
+<p><strong>结果</strong>：所有 .docx、.doc、.pdf 全部进入 <code>dark/</code> 子目录，数学公式 WMF、几何图都变成暖深灰底+暖米杏线条，晚上看不刺眼。</p>
+<p><strong>实测</strong>：202 个中考真题文件（30 PDF + 39 DOCX + 133 DOC），含 3021 张公式 WMF，<strong>6.4 分钟跑完</strong>。</p>
+<h3 id="2">场景 2：化学课本电子版（含彩色实验图）</h3>
+<pre><code class="language-bash">python3 scripts/darkmode_batch.py &quot;~/Documents/化学课本&quot;
+</code></pre>
+<p><strong>结果</strong>：文字背景护眼了，<strong>彩色实验照片保持原色</strong>——红色试剂还是红色，蓝色火焰还是蓝色。</p>
+<h3 id="3pdf">场景 3：PDF 电子书晚上读</h3>
+<pre><code class="language-bash">python3 scripts/darkmode_pdf.py &quot;~/Downloads/三体.pdf&quot; --dpi 250 --theme paper
+</code></pre>
+<p><strong>结果</strong>：仿羊皮纸 sepia 主题（背景烤纸黑、文字旧纸黄），最有读纸书感。</p>
+<h3 id="4">场景 4：拍照作业护眼</h3>
+<pre><code class="language-bash">python3 scripts/darkmode_image.py &quot;~/Downloads/作业拍照.jpg&quot;
+</code></pre>
+<p><strong>结果</strong>：白底纸张瞬间变成暖深灰底，黑字变成暖米杏，照片自动 EXIF 旋转校正方向。</p>
+<h3 id="5_1">场景 5：批量给截图做护眼版</h3>
+<pre><code class="language-bash"># 截图都在某个文件夹里
+python3 scripts/darkmode_batch.py &quot;~/Pictures/截图&quot;
+</code></pre>
+<p><strong>结果</strong>：所有 png/jpg 截图都生成 <code>_dark.&lt;原扩展&gt;</code> 版本。</p>
+<h3 id="6excel">场景 6：Excel 报表晚上看</h3>
+<pre><code class="language-bash">python3 scripts/darkmode_xlsx.py &quot;~/工作/销售月报.xlsx&quot;
+</code></pre>
+<p><strong>结果</strong>：所有单元格底色变暖深灰，字体变暖米杏，边框变暖深棕。</p>
+<h3 id="7">场景 7：把整个学习资料库换护眼</h3>
+<pre><code class="language-bash"># 包含 PDF + Word + Excel + 截图全混合的大目录
+python3 scripts/darkmode_batch.py &quot;~/Documents/学习资料&quot;
+</code></pre>
+<p><strong>结果</strong>：自动识别格式、保留原目录结构、单文件失败不影响其他、最后汇总报告。</p>
+<h3 id="8-doc">场景 8：给爸妈做护眼版老 .doc 文档（医疗资料/合同等）</h3>
+<pre><code class="language-bash">python3 scripts/darkmode_batch.py &quot;~/爸妈电脑同步/医疗资料&quot;
+</code></pre>
+<p><strong>结果</strong>：所有 <code>.doc</code> 老 Word 文档先自动批量转 <code>.docx</code>，再统一上护眼色，<strong>比逐个开 LibreOffice 快 10-20 倍</strong>。</p>
+<hr />
+<h2 id="4_1">🎨 4 套主题怎么选？</h2>
+<table>
+<thead>
+<tr>
+<th>主题</th>
+<th>背景色</th>
+<th>文字色</th>
+<th>对比度</th>
+<th>视觉感受</th>
+<th>适合</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>warm</code>（默认 ⭐）</td>
+<td><code>#1F1F1F</code> 暖深灰</td>
+<td><code>#D4C9A8</code> 暖米杏</td>
+<td>~11:1</td>
+<td>类 Kindle Paperwhite Dark</td>
+<td><strong>大多数情况，最护眼</strong></td>
+</tr>
+<tr>
+<td><code>paper</code></td>
+<td><code>#1B1A17</code> 烤纸黑</td>
+<td><code>#D8C9A0</code> 旧纸黄</td>
+<td>~12:1</td>
+<td>仿羊皮纸 sepia 暗色</td>
+<td>读小说、电子书</td>
+</tr>
+<tr>
+<td><code>gray</code></td>
+<td><code>#262626</code> 暖炭灰</td>
+<td><code>#D4D4D4</code> 暖灰白</td>
+<td>~12:1</td>
+<td>偏冷淡的护眼方案</td>
+<td>觉得 warm 太黄</td>
+</tr>
+<tr>
+<td><code>pure</code></td>
+<td><code>#000000</code> 纯黑</td>
+<td><code>#FFFFFF</code> 纯白</td>
+<td>21:1</td>
+<td>纯黑白（最刺眼）</td>
+<td>旧版兼容，<strong>不推荐</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>为什么不推荐纯黑白？</strong><br />
+纯白 + 纯黑对比度 21:1 是公认<strong>最伤眼</strong>的组合。Apple Dark Mode、VS Code Dark+、GitHub Dark、Kindle 暗色阅读全部<strong>不用纯白纯黑</strong>——暖色系（偏黄红）能降低蓝光刺激，长时间阅读最舒适。</p>
+<hr />
+<h2 id="faq">❓ 常见问题 FAQ</h2>
+<h3 id="q1-dark">Q1：处理完发现 dark/ 里的图标显示乱码 / 打不开？</h3>
+<p><strong>A</strong>：极少发生，通常是源文件本身格式损坏。<br />
+- 检查源文件能不能正常用 Word/Acrobat 打开<br />
+- 用 <code>--no-recursive</code> 单独跑这个文件看错误日志</p>
+<h3 id="q2">Q2：数学公式还是白底没反色？</h3>
+<p><strong>A</strong>：两个原因可能：<br />
+1. 没加 <code>--invert-images</code> 参数 → 默认模式确实不动插图，加上参数重跑<br />
+2. 加了参数但漏反色 → 检查 <code>wmf2gd</code> 是否装了：<code>which wmf2gd</code>，没装就 <code>brew install libwmf</code>（macOS）或 <code>sudo apt install libwmf-bin</code>（Linux）</p>
+<h3 id="q3-doc">Q3：处理 .doc 老格式特别慢？</h3>
+<p><strong>A</strong>：100+ 个 .doc 用 v2.0 的批量预转换是 <strong>28 秒 / 133 个</strong>。如果你装的是 v1.0 旧版，请升级到 v2.0：</p>
+<pre><code class="language-bash">cd ~/darkmode-doc-youge
+git pull
+</code></pre>
+<h3 id="q4-docx">Q4：处理完 docx 文件变大了？</h3>
+<p><strong>A</strong>：正常。<br />
+- <strong>默认模式</strong>：体积基本不变（甚至小一点）<br />
+- <strong><code>--invert-images</code> 模式</strong>：因为 WMF 矢量公式被转成 PNG 位图，体积会变大 2-5 倍。这是为了保证公式正确反色的必要代价。<br />
+- PDF 处理后体积通常变大（200dpi 整页栅格化图比原 PDF 的文字流大）。可以加 <code>--dpi 150</code> 降清晰度换体积。</p>
+<h3 id="q5">Q5：处理完原文件还在吗？</h3>
+<p><strong>A</strong>：在。<strong>绝对不动原文件</strong>——所有输出统一加 <code>_dark</code> 后缀放到 <code>dark/</code> 子目录。可以放心试。</p>
+<h3 id="q6">Q6：可以中途取消吗？</h3>
+<p><strong>A</strong>：可以，<code>Ctrl+C</code> 即可。已经处理完的文件保留在 <code>dark/</code>，没处理完的下次重跑会从头开始（不会断点续传，但跳过已处理的不会重复做）。</p>
+<h3 id="q7mac">Q7：Mac 第一次跑提示"无法验证开发者"？</h3>
+<p><strong>A</strong>：通常是 LibreOffice 安装时的提示。<br />
+- 系统设置 → 隐私与安全性 → 滚到底找到"已阻止 LibreOffice" → 点"仍要打开"<br />
+- 或者命令行：<code>sudo xattr -rd com.apple.quarantine /Applications/LibreOffice.app</code></p>
+<h3 id="q8-windows">Q8：能用在 Windows 上吗？</h3>
+<p><strong>A</strong>：能，但建议用 WSL2（Win10/11 自带的 Linux 子系统）。原生 Windows 也可以，但需要：<br />
+- 安装 Python 3.10+<br />
+- 安装 LibreOffice（手动加到 PATH）<br />
+- 安装 libwmf（找 Windows 版二进制，比较麻烦）</p>
+<h3 id="q9">Q9：要不要联网？</h3>
+<p><strong>A</strong>：<strong>不要</strong>。所有处理都在本地完成，零联网、零上传、零隐私泄露。试卷/合同/简历这种敏感文件可以放心处理。</p>
+<h3 id="q10">Q10：能改成更深 / 更浅的颜色吗？</h3>
+<p><strong>A</strong>：可以。修改 <code>scripts/themes.py</code> 里的 <code>THEMES</code> 字典，加自己的主题：</p>
+<pre><code class="language-python">&quot;my_theme&quot;: {
+    &quot;name&quot;: &quot;我的主题&quot;,
+    &quot;bg&quot;: &quot;2A2520&quot;,        # 背景色 hex（无 #）
+    &quot;fg&quot;: &quot;E0D5B5&quot;,        # 文字色 hex
+    &quot;border&quot;: &quot;6B5E4C&quot;,    # 边框色 hex
+    &quot;bg_rgb&quot;: (42, 37, 32),
+    &quot;fg_rgb&quot;: (224, 213, 181),
+},
+</code></pre>
+<p>然后用 <code>--theme my_theme</code> 调用。</p>
+<hr />
+<h2 id="_6">🛠 故障排除</h2>
+<h3 id="modulenotfounderror-no-module-named-fitz">错误：<code>ModuleNotFoundError: No module named 'fitz'</code></h3>
+<p><strong>原因</strong>：PyMuPDF 没装。<br />
+<strong>解决</strong>：<code>pip3 install --user --break-system-packages PyMuPDF</code></p>
+<h3 id="libreoffice-soffice-doc">错误：<code>缺少 LibreOffice (soffice)，无法处理 .doc</code></h3>
+<p><strong>原因</strong>：处理 <code>.doc</code> 老格式必须 LibreOffice，但没装。<br />
+<strong>解决</strong>：<br />
+- macOS：<code>brew install libreoffice</code><br />
+- Linux：<code>sudo apt install libreoffice</code><br />
+- 装完后命令行能跑通：<code>soffice --version</code></p>
+<h3 id="docx-x-wmf-cannot-find-loader-for-this-wmf-file">错误：处理完 docx 里 <code>! 图片反色失败 (x-wmf): cannot find loader for this WMF file</code></h3>
+<p><strong>原因</strong>：开了 <code>--invert-images</code> 但没装 <code>wmf2gd</code>。<br />
+<strong>解决</strong>：<br />
+- macOS：<code>brew install libwmf</code><br />
+- Linux：<code>sudo apt install libwmf-bin</code><br />
+- 然后重跑</p>
+<h3 id="_7">错误：处理大目录时某些文件失败</h3>
+<p><strong>正常情况</strong>。本 skill 是<strong>异常隔离</strong>设计——单个文件失败不影响其他，最后会列出失败清单。常见失败原因：<br />
+- 源文件损坏<br />
+- 源文件正被 Word 打开（产生 <code>~$xxx.docx</code> 锁，自动跳过）<br />
+- 文件名含特殊字符（罕见）</p>
+<p>把失败的文件单独跑一次看具体错误。</p>
+<h3 id="getdata-is-deprecated">警告：<code>getdata is deprecated</code></h3>
+<p><strong>忽略</strong>。Pillow 14（2027 年）才会移除，目前不影响功能。</p>
+<hr />
+<h2 id="_8">📦 卸载</h2>
+<p>整个 skill 删除即可，不会留下任何系统残留：</p>
+<pre><code class="language-bash">rm -rf ~/.cursor/skills/darkmode-doc-youge   # 如果是作为 Cursor skill 用
+rm -rf ~/darkmode-doc-youge                  # 如果是 git clone 用
+</code></pre>
+<p>依赖（按需保留或卸载）：</p>
+<pre><code class="language-bash">pip3 uninstall PyMuPDF python-docx Pillow openpyxl    # 这些库其他项目可能也在用
+brew uninstall libreoffice libwmf                      # LibreOffice 是常用办公软件，建议保留
+</code></pre>
+<hr />
+<h2 id="_9">🤝 反馈与贡献</h2>
+<ul>
+<li>GitHub：https://github.com/shiyousun/darkmode-doc-youge</li>
+<li>提 Issue：发现 bug 或有改进建议</li>
+<li>提 PR：欢迎贡献新主题、新格式支持</li>
+</ul>
+<hr />
+<h2 id="i">ℹ 关于</h2>
+<p>由 <strong>友哥 &amp; AI</strong> 共同创造，献给所有长时间用电脑、手机看文档的眼睛。</p>
+<p>希望你的眼睛不再因为白底文档而疲劳。</p>
+<p>License: MIT</p>
+  <footer>
+    本文档使用 <strong>warm 暖杏色</strong> 主题渲染（背景 #1F1F1F 暖深灰，文字 #D4C9A8 暖米杏）<br>
+    —— 你正在看的就是 skill 处理后的实际效果 ✨<br><br>
+    GitHub: <a href="https://github.com/shiyousun/darkmode-doc-youge">shiyousun/darkmode-doc-youge</a> ·
+    由 友哥 &amp; AI 共同创造 · License: MIT
+  </footer>
+</div>
+</body>
+</html>
